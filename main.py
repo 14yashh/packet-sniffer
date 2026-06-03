@@ -1,5 +1,6 @@
 import socket
 import os
+from packet_models import IPv4Packet
 
 # Automatically get the local machine's hostname, then translate it to an IP
 hostname = socket.gethostname()
@@ -26,8 +27,11 @@ def main():
             # Receive up to 65535 bytes of data
             raw_packet, addr = sniffer.recvfrom(65535)
 
-            # Print the raw bytes to the terminal
-            print(raw_packet)
+            # Pass the raw bytes into our IPv4 class
+            ip_packet = IPv4Packet(raw_packet)
+
+            # Print the clean, structured data
+            print(f"IPv4 -> Src: {ip_packet.src_ip:<15} Dest: {ip_packet.dest_ip:<15} Protocol: {ip_packet.protocol}")
 
     except KeyboardInterrupt:
         print("\n[*] Stopping sniffer...")
