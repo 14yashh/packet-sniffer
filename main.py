@@ -1,6 +1,6 @@
 import socket
 import os
-from packet_models import IPv4Packet
+from packet_models import IPv4Packet, TCPSegment
 
 # Automatically get the local machine's hostname, then translate it to an IP
 hostname = socket.gethostname()
@@ -30,8 +30,21 @@ def main():
             # Pass the raw bytes into our IPv4 class
             ip_packet = IPv4Packet(raw_packet)
 
-            # Print the clean, structured data
-            print(f"IPv4 -> Src: {ip_packet.src_ip:<15} Dest: {ip_packet.dest_ip:<15} Protocol: {ip_packet.protocol}")
+            # Check if the protocol is TCP (Protocol 6)
+            if ip_packet.protocol == 6:
+                # Pass the IPv4 payload (which is the TCP packet) into our new class
+                tcp = TCPSegment(ip_packet.payload)
+
+                # Figure out which flags are flipped on
+                flags = []
+                if tcp.flag_syn: flags.append("SYN")
+                if tcp.flag_ack: flags.append("ACK")
+
+                # If no SYN or ACK flags are set, we will just call it DATA for now
+                flag_str = "+".join(flags) if flags else "DATA"
+
+                # Print the clean TCP data with Ports and Flags
+                print(f"TCP | {ip_packet.src_ip}:{tcp.src_port:<5} -> {ip_packet.dest_ip}:{tcp.dest_port:<5} | Flags: [{flag_str}]")
 
     except KeyboardInterrupt:
         print("\n[*] Stopping sniffer...")
