@@ -13,6 +13,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Windows IPv4/TCP/UDP packet sniffer")
     parser.add_argument("--proto", choices=["tcp", "udp"], help="Filter by protocol (tcp or udp)")
     parser.add_argument("--port", type=int, help="Filter by port number (matches src or dst)")
+    parser.add_argument("--ip", type=str, help="Filter by IP address (matches src or dst)")
     return parser.parse_args()
 
 
@@ -57,6 +58,10 @@ def main():
                 if args.port and args.port not in (tcp.src_port, tcp.dest_port):
                     continue
 
+                # Skip if user filtered for an IP that doesn't match src or dst
+                if args.ip and args.ip not in (ip_packet.src_ip, ip_packet.dest_ip):
+                    continue
+
                 # Figure out which flags are flipped on
                 flags = []
                 if tcp.flag_syn: flags.append("SYN")
@@ -79,6 +84,10 @@ def main():
 
                 # Skip if user filtered for a port that doesn't match src or dst
                 if args.port and args.port not in (udp.src_port, udp.dest_port):
+                    continue
+
+                # Skip if user filtered for an IP that doesn't match src or dst
+                if args.ip and args.ip not in (ip_packet.src_ip, ip_packet.dest_ip):
                     continue
 
                 # Print the clean UDP data with Ports and Length
