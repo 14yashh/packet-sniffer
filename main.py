@@ -64,8 +64,12 @@ def main():
 
                 # Figure out which flags are flipped on
                 flags = []
+                if tcp.flag_fin: flags.append("FIN")
                 if tcp.flag_syn: flags.append("SYN")
+                if tcp.flag_rst: flags.append("RST")
+                if tcp.flag_psh: flags.append("PSH")
                 if tcp.flag_ack: flags.append("ACK")
+                if tcp.flag_urg: flags.append("URG")
 
                 # If no SYN or ACK flags are set, we will just call it DATA for now
                 flag_str = "+".join(flags) if flags else "DATA"

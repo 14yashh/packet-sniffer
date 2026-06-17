@@ -60,11 +60,13 @@ class TCPSegment:
         offset_reserved_flags = unpacked_data[4]
 
         # Using Bitwise AND (&) to isolate specific flag bits from the 16-bit field
-        # SYN flag is the 2nd bit from the right (decimal value 2)
-        self.flag_syn = (offset_reserved_flags & 2) != 0
-
-        # ACK flag is the 5th bit from the right (decimal value 16)
-        self.flag_ack = (offset_reserved_flags & 16) != 0
+        # Each flag occupies one bit — hex values make the bit positions explicit
+        self.flag_fin = (offset_reserved_flags & 0x001) != 0   # Bit 0 — connection close
+        self.flag_syn = (offset_reserved_flags & 0x002) != 0   # Bit 1 — connection start
+        self.flag_rst = (offset_reserved_flags & 0x004) != 0   # Bit 2 — connection reset
+        self.flag_psh = (offset_reserved_flags & 0x008) != 0   # Bit 3 — push data immediately
+        self.flag_ack = (offset_reserved_flags & 0x010) != 0   # Bit 4 — acknowledgment
+        self.flag_urg = (offset_reserved_flags & 0x020) != 0   # Bit 5 — urgent data
 
         # Extract the Data Offset (top 4 bits of the 16-bit integer)
         # Shift right by 12 bits to isolate it, then multiply by 4 to convert words to bytes
