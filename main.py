@@ -1,6 +1,7 @@
 import socket
 import os
 from packet_models import IPv4Packet, TCPSegment, UDPDatagram
+from datetime import datetime
 
 # Automatically get the local machine's hostname, then translate it to an IP
 hostname = socket.gethostname()
@@ -30,6 +31,8 @@ def main():
             # Pass the raw bytes into our IPv4 class
             ip_packet = IPv4Packet(raw_packet)
 
+            timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+
             # Check if the protocol is TCP (Protocol 6)
             if ip_packet.protocol == 6:
                 # Pass the IPv4 payload (which is the TCP packet) into our new class
@@ -44,13 +47,10 @@ def main():
                 flag_str = "+".join(flags) if flags else "DATA"
 
                 # Print the clean TCP data with Ports and Flags
-                print(f"TCP | {ip_packet.src_ip}:{tcp.src_port:<5} -> {ip_packet.dest_ip}:{tcp.dest_port:<5} | Flags: [{flag_str}]")
-
+                print(f"[{timestamp}] TCP | {ip_packet.src_ip}:{tcp.src_port:<5} -> {ip_packet.dest_ip}:{tcp.dest_port:<5} | Flags: [{flag_str}]")
             elif ip_packet.protocol == 17:
                 udp = UDPDatagram(ip_packet.payload)
-
-                print(
-                    f"UDP | {ip_packet.src_ip}:{udp.src_port:<5} -> {ip_packet.dest_ip}:{udp.dest_port:<5} | Len: {udp.length}")
+                print(f"[{timestamp}] UDP | {ip_packet.src_ip}:{udp.src_port:<5} -> {ip_packet.dest_ip}:{udp.dest_port:<5} | Len: {udp.length}")
 
     except KeyboardInterrupt:
         print("\n[*] Stopping sniffer...")
