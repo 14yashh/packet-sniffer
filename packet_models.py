@@ -72,3 +72,25 @@ class TCPSegment:
 
         # Everything after the header length is the actual application payload
         self.payload = raw_data[tcp_header_length:]
+
+class UDPDatagram:
+    def __init__(self, raw_data):
+        """
+        UDP header is fixed at 8 bytes.
+
+        Format string: '! H H H H'
+        ! = Network byte order (Big-Endian)
+        H = 2 bytes for Source Port
+        H = 2 bytes for Destination Port
+        H = 2 bytes for Length (header + payload)
+        H = 2 bytes for Checksum
+        """
+        unpacked_data = struct.unpack('! H H H H', raw_data[:8])
+
+        self.src_port  = unpacked_data[0]
+        self.dest_port = unpacked_data[1]
+        self.length    = unpacked_data[2]
+        self.checksum  = unpacked_data[3]
+
+        # Everything after the 8-byte UDP header is the payload
+        self.payload = raw_data[8:]

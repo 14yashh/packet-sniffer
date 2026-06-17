@@ -1,6 +1,6 @@
 import socket
 import os
-from packet_models import IPv4Packet, TCPSegment
+from packet_models import IPv4Packet, TCPSegment, UDPDatagram
 
 # Automatically get the local machine's hostname, then translate it to an IP
 hostname = socket.gethostname()
@@ -45,6 +45,12 @@ def main():
 
                 # Print the clean TCP data with Ports and Flags
                 print(f"TCP | {ip_packet.src_ip}:{tcp.src_port:<5} -> {ip_packet.dest_ip}:{tcp.dest_port:<5} | Flags: [{flag_str}]")
+
+            elif ip_packet.protocol == 17:
+                udp = UDPDatagram(ip_packet.payload)
+
+                print(
+                    f"UDP | {ip_packet.src_ip}:{udp.src_port:<5} -> {ip_packet.dest_ip}:{udp.dest_port:<5} | Len: {udp.length}")
 
     except KeyboardInterrupt:
         print("\n[*] Stopping sniffer...")
